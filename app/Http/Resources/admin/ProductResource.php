@@ -16,16 +16,26 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'price' => $this->price,
+            'description'  => $this->description,
+            'product_advantage'=> $this->product_advantage ?? null,
+            'category_name'=> $this->category->name,
             'category_id' => $this->category_id,
             'is_featured' => $this->is_featured,
             'created_at' => $this->created_at,
-            'colors' => $this->productColorImages->map(function($colorImage) {
-                return [
-                    'color_id' => $colorImage->color_id,
-                    'color_name' => $colorImage->color->name ?? null,
-                    'image_url' => $colorImage->image ? asset('storage/' . $colorImage->image) : null,
-                ];
-            }),
+            'colors' => $this->productColorImages
+                ->groupBy('color_id')
+                ->map(function ($images) {
+                    $color = $images->first()->color;
+
+                    return [
+                        'id'   => $color->id,
+                        'name' => $color->name ?? null,
+                        'hex'  => $color->hex_code ?? null,
+                        'images' => $images->map(function ($img) {
+                            return $img->image ? asset('storage/' . $img->image) : null;
+                        })->filter()->values(),
+                    ];
+                })->values(),
         ];
     }
 }

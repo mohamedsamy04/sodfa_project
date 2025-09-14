@@ -39,9 +39,11 @@ class Cart extends BaseModel
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'price' => $quantity * $product->price,
+                
+
             ]);
         }
-        
+
         $this->price = $this->cartItems()->sum('price');
         $this->save();
     }

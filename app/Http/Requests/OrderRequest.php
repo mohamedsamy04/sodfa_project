@@ -27,8 +27,8 @@ class OrderRequest extends FormRequest
             'city' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'address' => 'required|string|max:255',
-            'payment_method' => 'required|string|max:255',
-            'receipt_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'payment_method' => 'required|string|in:vodafone_cash,instapay',
+            'receipt_image' => 'required|url',
         ];
     }
 }

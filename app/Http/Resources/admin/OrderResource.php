@@ -5,6 +5,7 @@ namespace App\Http\Resources\admin;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\user\Order;
+use App\Http\Resources\user\OrderItemResource;
 
 class OrderResource extends JsonResource
 {
@@ -27,27 +28,25 @@ class OrderResource extends JsonResource
                 $this->status === 'canceled',
                 $this->cancellation_reason
             ),
+            'return_request' => $this->when(
+                $this->return_reason && $this->return_status,
+                [
+                    'status'       => $this->return_status,
+                    'reason'       => $this->return_reason,
+                    'requested_at' => $this->return_requested_at,
+                    'handled_at'   => $this->return_handled_at
+                ]
+            ),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'payment_method' => $this->whenLoaded('paymentMethod', function () {
                 return [
-                    'method' => $this->paymentMethod->payment_method ?? null,
-                    'status' => $this->paymentMethod->status ?? null,
-                    'receipt_image' => $this->paymentMethod->receipt_image ?? null,
+                    'method' => $this->paymentMethod->method,
+                    'receipt_image' => $this->paymentMethod->receipt_image,
                 ];
             }),
-            'items' => $this->whenLoaded('orderItems', function () {
-                return $this->orderItems->map(function ($item) {
-                    return [
-                        'product_id' => $item->product_id,
-                        'name' => $item->product->name ?? null,
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'subtotal' => $item->subtotal,
-                    ];
-                });
-            }),
+            'items' => OrderItemResource::collection($this->whenLoaded('orderItems')),
         ];
     }
-
 }

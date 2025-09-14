@@ -15,7 +15,7 @@ class FavoriteController extends Controller
     public function index()
     {
         $favorites = Favorite::where('user_id', auth()->id())
-            ->with('product')
+            ->with('product.productColorImages.color')
             ->get();
 
         return response()->json([
@@ -40,9 +40,14 @@ class FavoriteController extends Controller
             'message' => 'Product added to favorites',
         ]);
     }
-
-    public function destroy(Favorite $favorite)
+    public function destroy($id)
     {
+        $favorite = Favorite::find($id);
+
+        if (!$favorite) {
+            return response()->json(['message' => 'Favorite not found'], 404);
+        }
+
         if ($favorite->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -53,6 +58,7 @@ class FavoriteController extends Controller
             'message' => 'Favorite deleted successfully',
         ]);
     }
+
 
     public function clear()
     {

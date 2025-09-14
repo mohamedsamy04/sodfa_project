@@ -32,7 +32,7 @@ class UserController extends Controller
             }
         }
 
-        $users = UserResource::collection($query->paginate(12));
+        $users = $query->paginate(12);
 
         $totalUsers = User::count();
         $newUsersThisMonth = User::whereMonth('created_at', now()->month)
@@ -53,7 +53,13 @@ class UserController extends Controller
                 'newUsersThisWeek' => $newUsersThisWeek,
                 'averageDailyUsers' => $averageDailyUsers,
             ],
-            'users' => $users,
+            'users' => UserResource::collection($users),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'last_page' => $users->lastPage(),
+            ],
         ]);
     }
 }

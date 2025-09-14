@@ -3,6 +3,7 @@
 namespace App\Models\products;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\user\CartItem;
 
 class Color extends BaseModel
 {
@@ -15,5 +16,9 @@ class Color extends BaseModel
     public function productColorImage()
     {
         return $this->hasMany(ProductColorImage::class);
+    }
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
 }

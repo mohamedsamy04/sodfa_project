@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\AnalysisController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\user\FavoriteController;
 use App\Http\Controllers\user\CartController;
 use App\Http\Controllers\user\OrderController;
@@ -29,6 +30,8 @@ use App\Http\Controllers\user\ProductController as UserProductController;
 
 Route::post('/register' , [AuthController::class , 'register']);
 Route::post('/login' , [Authcontroller::class , 'login']);
+Route::get('user/products' , [UserProductController::class , 'allProducts']);
+Route::get('home' , [UserProductController::class , 'home']);
 
 Route::middleware('api' , 'auth:sanctum')->group(function () {
 
@@ -37,22 +40,24 @@ Route::middleware('api' , 'auth:sanctum')->group(function () {
 
     Route::get('/favorites' , [FavoriteController::class , 'index']);
     Route::post('/favorites' , [FavoriteController::class , 'store']);
-    Route::delete('/favorites/{favorite}' , [FavoriteController::class , 'destroy']);
-    Route::delete('/favorites/{favorite}/clear' , [FavoriteController::class , 'clear']);
+    Route::delete('/favorites/clear' , [FavoriteController::class , 'clear']);
+    Route::delete('/favorites/{id}' , [FavoriteController::class , 'destroy']);
+
 
     Route::get('/carts' , [CartController::class , 'index']);
     Route::post('/carts' , [CartController::class , 'store']);
-    Route::patch('/carts/{cartItem}' , [CartController::class , 'update']);
-    Route::delete('/carts/{cartItem}' , [CartController::class , 'destroy']);
-    Route::delete('/carts/{cart}/clear' , [CartController::class , 'clear']);
+    Route::patch('/carts/{id}' , [CartController::class , 'update']);
+    Route::delete('/carts/clear' , [CartController::class , 'clear']);
+    Route::delete('/carts/{id}' , [CartController::class , 'destroy']);
+
 
     Route::post('user/orders' , [OrderController::class , 'store']);
     Route::get('user/orders' , [OrderController::class , 'index']);
-    Route::get('user/orders/{order}' , [OrderController::class , 'show']);
-    Route::patch('user/orders/{order}' , [OrderController::class , 'cancel']);
+    Route::get('user/orders/{id}' , [OrderController::class , 'show']);
+    Route::patch('user/orders/{id}' , [OrderController::class , 'cancel']);
+    Route::post('user/orders/{id}/return' , [OrderController::class , 'return']);
 
-    Route::get('user/products' , [UserProductController::class , 'allProducts']);
-    Route::get('home' , [UserProductController::class , 'home']);
+
 
 
 
@@ -66,9 +71,13 @@ Route::middleware('api' , 'auth:sanctum')->group(function () {
         Route::put('/products/{product}' , [ProductController::class , 'update']);
         Route::delete('/products/{product}' , [ProductController::class , 'destroy']);
 
+        Route::get('/colors', [ColorController::class, 'index']);
+
         Route::get('/orders' , [AdminOrderController::class , 'index']);
-        Route::patch('/orders/{order}' , [AdminOrderController::class , 'update']);
-        Route::delete('/orders/{order}' , [AdminOrderController::class , 'destroy']);
+        Route::get('/orders/{id}' , [AdminOrderController::class , 'show']);
+        Route::patch('/orders/{id}' , [AdminOrderController::class , 'update']);
+        Route::patch('/orders/{id}/return', [AdminOrderController::class, 'handleReturnRequest']);
+        Route::delete('/orders/{id}' , [AdminOrderController::class , 'destroy']);
 
         Route::get('/analysis' , [AnalysisController::class , 'index']);
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->enum('method', ['vodafone_cash', 'instapay']);
-            $table->string('receipt_image')->nullable();
+            $table->string('receipt_image');
             $table->enum('status', ['processing', 'completed', 'failed'])->default('processing');
             $table->timestamps();
         });

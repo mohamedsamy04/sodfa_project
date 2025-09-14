@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('phone');
-            $table->string('email')->nullable();
+            $table->string('email');
             $table->string('city');
-            $table->string('address')->nullable();
+            $table->string('address');
             $table->decimal('total_price', 10, 2)->default(0);
             $table->string('status')->default('processing'); // processing, delivered
             $table->timestamps();

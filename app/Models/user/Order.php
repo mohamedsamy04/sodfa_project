@@ -12,7 +12,17 @@ class Order extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'name', 'phone', 'email', 'city', 'address', 'total_price', 'status'
+        'user_id',
+        'name',
+        'phone',
+        'email',
+        'city',
+        'address',
+        'total_price',
+        'status',
+        'cancellation_reason',
+        'return_status',   // processing | approved | rejected
+        'return_reason',
     ];
 
     public function user()

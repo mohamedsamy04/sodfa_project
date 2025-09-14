@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\user;
+namespace App\Http\Resources\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -9,8 +9,6 @@ class OrderResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray($request)
     {
@@ -23,25 +21,53 @@ class OrderResource extends JsonResource
             'city'          => $this->city,
             'address'       => $this->address,
             'status'        => $this->status,
-            'total_price'   => $this->total_price,
+            'total_price'   => (float) $this->total_price,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
 
+            // ====== الإلغاء ======
             'cancellation_reason' => $this->when(
-                $this->status === 'canceled',
+                $this->status === 'canceled' && !empty($this->cancellation_reason),
                 $this->cancellation_reason
             ),
 
-            'items'         => OrderItemResource::collection($this->orderItems),
+            // ====== الاسترجاع ======
+            'return_reason' => $this->when(
+                !empty($this->return_reason),
+                $this->return_reason
+            ),
+            'return_status' => $this->when(
+                !empty($this->return_status),
+                $this->return_status
+            ),
 
-            'payment_method'=> [
-                'id'             => $this->paymentMethod->id ?? null,
-                'payment_method' => $this->paymentMethod->payment_method ?? null,
-                'receipt_image'  => $this->paymentMethod?->receipt_image
-                                    ? asset('storage/' . $this->paymentMethod->receipt_image)
-                                    : null,
-                'status'         => $this->paymentMethod->status ?? null,
-            ],
+            // ====== المنتجات ======
+            'items' => OrderItemResource::collection($this->whenLoaded('orderItems')),
+
+            // ====== الدفع ======
+            'payment_method' => $this->when(
+                $this->relationLoaded('paymentMethod'),
+                [
+                    'id'            => $this->paymentMethod?->id,
+                    'method'        => match ($this->paymentMethod?->method) {
+                        'vodafone_cash' => 'Vodafone Cash',
+                        'instapay'      => 'Instapay'
+                    },
+                    'receipt_image' => $this->paymentMethod?->receipt_image,
+                    'created_at'    => $this->paymentMethod?->created_at,
+                    'updated_at'    => $this->paymentMethod?->updated_at,
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * Additional data to return with the resource.
+     */
+    public function with($request)
+    {
+        return [
+            'success' => true,
         ];
     }
 }
